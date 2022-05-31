@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     private var mImageButtonCurrentPaint: ImageButton? = null
     private var mLinearLayoutPaintColors: LinearLayout? = null
     private var ibGallary: ImageButton? = null
+    private var ibUndo:ImageButton? = null
+    private var ibRedo:ImageButton? = null
     private val activityResultLauncher : ActivityResultLauncher<Array<String>> = registerForActivityResult( ActivityResultContracts.RequestMultiplePermissions() ){
         permissions ->
         permissions.entries.forEach{
@@ -57,6 +59,8 @@ class MainActivity : AppCompatActivity() {
         mLinearLayoutPaintColors = findViewById(R.id.ll_paint_colors)
         mImageButtonCurrentPaint = mLinearLayoutPaintColors!![2] as ImageButton
         ibGallary = findViewById(R.id.ib_gallary)
+        ibUndo = findViewById(R.id.ib_undo)
+        ibRedo = findViewById(R.id.ib_redo)
 
         mImageButtonCurrentPaint!!.setImageDrawable(
             ContextCompat.getDrawable(this, R.drawable.pallet_pressed)
@@ -70,6 +74,13 @@ class MainActivity : AppCompatActivity() {
             requestStoragePermission()
 
         }
+        ibUndo?.setOnClickListener{view->
+            drawingView?.undo()
+        }
+        ibRedo?.setOnClickListener{view->
+            drawingView?.redo()
+        }
+
     }
 
     private fun requestStoragePermission() {
