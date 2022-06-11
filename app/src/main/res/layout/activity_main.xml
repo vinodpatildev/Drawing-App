@@ -159,13 +159,20 @@
             android:scaleType="fitXY"
             android:src="@drawable/add_image" />
         <ImageButton
+            android:id="@+id/ib_save"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/save" />
+
+        <ImageButton
             android:id="@+id/ib_redo"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="5dp"
             android:scaleType="fitXY"
             android:src="@drawable/redo" />
-
 
     </LinearLayout>
 

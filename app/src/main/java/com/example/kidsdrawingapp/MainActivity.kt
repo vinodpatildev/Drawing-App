@@ -4,19 +4,28 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.media.MediaScannerConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
     private var drawingView: DrawingView? = null
@@ -26,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private var ibGallary: ImageButton? = null
     private var ibUndo:ImageButton? = null
     private var ibRedo:ImageButton? = null
+    private var ibSave:ImageButton? = null
     private val activityResultLauncher : ActivityResultLauncher<Array<String>> = registerForActivityResult( ActivityResultContracts.RequestMultiplePermissions() ){
         permissions ->
         permissions.entries.forEach{
@@ -61,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         ibGallary = findViewById(R.id.ib_gallary)
         ibUndo = findViewById(R.id.ib_undo)
         ibRedo = findViewById(R.id.ib_redo)
+        ibSave = findViewById(R.id.ib_save)
 
         mImageButtonCurrentPaint!!.setImageDrawable(
             ContextCompat.getDrawable(this, R.drawable.pallet_pressed)
@@ -80,7 +91,22 @@ class MainActivity : AppCompatActivity() {
         ibRedo?.setOnClickListener{view->
             drawingView?.redo()
         }
+        ibSave?.setOnClickListener{view->
+            if(isReadStorageAllowed()){
+                lifecycleScope.launch{
+                    val flDrawingView: FrameLayout = findViewById(R.id.fl_drawing_view_container)
+                    saveBitmapFile( getBitmapFromView( flDrawingView ) )
+                }
+            }
+        }
 
+    }
+
+    private fun isReadStorageAllowed():Boolean{
+        val resultRead = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        val resultWrite = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        return resultRead == PackageManager.PERMISSION_GRANTED && resultWrite == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestStoragePermission() {
@@ -132,9 +158,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun changePaintColor(view: View) {
-
         if (view !== mImageButtonCurrentPaint) {
-//            Toast.makeText(this,"changePaintColor clicked",Toast.LENGTH_LONG).show()
 
             val colorTag = (view as ImageButton).tag.toString()
             drawingView?.setColor(colorTag)
@@ -147,6 +171,61 @@ class MainActivity : AppCompatActivity() {
                 ContextCompat.getDrawable(this, R.drawable.pallet_pressed)
             )
         }
+    }
+    private fun getBitmapFromView(view: View) : Bitmap {
+        val returnedBitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(returnedBitmap)
+        val bgDrawable = view.background
+        if(bgDrawable != null){
+            bgDrawable.draw(canvas)
+        }else{
+            canvas.drawColor(Color.WHITE)
+        }
+        view.draw(canvas)
+        return returnedBitmap
+    }
 
+    private suspend fun saveBitmapFile(mBitmap: Bitmap?): String{
+        var result = ""
+        withContext(Dispatchers.IO){
+            if(mBitmap != null){
+                try{
+                    val bytes = ByteArrayOutputStream()
+                    mBitmap.compress(Bitmap.CompressFormat.PNG, 90, bytes)
+
+                    val f = File(externalCacheDir?.absoluteFile.toString() + File.separator + "DrawingApp_" + System.currentTimeMillis()/1000 + ".png")
+
+                    val fo = FileOutputStream(f)
+                    fo.write(bytes.toByteArray())
+                    fo.close()
+
+                    result = f.absolutePath
+
+                    runOnUiThread{
+                        if(result.isNotEmpty()){
+                            Toast.makeText(this@MainActivity,"File saved successfully.", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+                catch (e: Exception){
+                    result = ""
+                    e.printStackTrace()
+                }
+            }
+        }
+        if(result.isNotEmpty()){
+            shareImage(result)
+        }
+        return result
+    }
+    private fun shareImage(result: String){
+        MediaScannerConnection.scanFile(this, arrayOf(result), null){
+            path,uri ->
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.type = "image/png"
+            startActivity(Intent.createChooser(shareIntent,"Share this image using...."))
+        }
     }
 }
