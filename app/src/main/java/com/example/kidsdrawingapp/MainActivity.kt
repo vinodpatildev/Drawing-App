@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
             imageBackGround.setImageURI(result.data?.data)
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -121,6 +122,7 @@ class MainActivity : AppCompatActivity() {
             ))
         }
     }
+
     private fun showRationaleDialog(title: String, message: String) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(title)
@@ -172,6 +174,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
     private fun getBitmapFromView(view: View) : Bitmap {
         val returnedBitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(returnedBitmap)
@@ -218,6 +221,7 @@ class MainActivity : AppCompatActivity() {
         }
         return result
     }
+
     private fun shareImage(result: String){
         MediaScannerConnection.scanFile(this, arrayOf(result), null){
             path,uri ->
