@@ -13,14 +13,14 @@ This android application can be used to draw various shapes, drawings on mobile 
 
 <table>
   <tr>
-    <th>Company</th>
-    <th>Contact</th>
-    <th>Country</th>
+    <th>Draw Drawing</th>
+    <th>Share Your Work</th>
+    <th>Choose Brush Of Your Need</th>
   </tr>
   <tr>
-    <td> <img src="https://github.com/vinodpatildev/Musify/blob/master/screenshots%20of%20app/home.jpg" width="250" /> </td>
-    <td> <img src="https://github.com/vinodpatildev/Musify/blob/master/screenshots%20of%20app/home.jpg" width="250" /> </td>
-    <td> <img src="https://github.com/vinodpatildev/Musify/blob/master/screenshots%20of%20app/home.jpg" width="250" /> </td>
+	<td> <img src="https://github.com/vinodpatildev/Drawing-App/blob/master/screenshots%20of%20app/drawing_app_1.jpg" width="250" /> </td>
+	<td> <img src="https://github.com/vinodpatildev/Drawing-App/blob/master/screenshots%20of%20app/drawing_app_2.jpg" width="250" /> </td>
+	<td> <img src="https://github.com/vinodpatildev/Drawing-App/blob/master/screenshots%20of%20app/drawing_app_3.jpg" width="250" /> </td>
   </tr>
 </table>
 
